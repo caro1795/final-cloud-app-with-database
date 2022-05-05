@@ -91,7 +91,7 @@ class CourseDetailView(generic.DetailView):
 
 class ExamResultView(generic.DetailView):
     model = Course
-    
+
     template_name = 'onlinecourse/exam_result_bootstrap.html'
 
 
@@ -122,7 +122,9 @@ def submit(request, course_id):
     enrollment = Enrollment.objects.get(user=user, course=course)
     submission = Submission.objects.create(enrollment=enrollment)
     submission.choices.set( extract_answers(request))
+    submission.save()
     return HttpResponseRedirect(reverse(viewname='onlinecourse:show_exam_result', args=(course.id,submission.id,)))
+
 
 # <HINT> A example method to collect the selected choices from the exam form from the request object
 def extract_answers(request):
@@ -134,14 +136,32 @@ def extract_answers(request):
             submitted_anwsers.append(choice_id)
     return submitted_anwsers
 
-
 # <HINT> Create an exam result view to check if learner passed exam and show their question results and result for each question,
 # you may implement it based on the following logic:
         # Get course and submission based on their ids
         # Get the selected choice ids from the submission record
         # For each selected choice, check if it is a correct answer or not
         # Calculate the total score
-#def show_exam_result(request, course_id, submission_id):
+def show_exam_result(request, course_id, submission_id):
+    course = get_object_or_404(Course, pk=course_id)
+    submission = get_object_or_404(Submission, pk=submission_id)
+    choices = submission.choices.all()
+    total_points = 0
+    correct_points = 0
+    for question in course.question_set.all():
+        total_points += question.grade_point
+        if question.is_get_score(choices):
+            correct_points += question.grade_point
+    grade = int((correct_points/total_points) * 100)
+    print("the final grade is:", str(grade))
+    return render(
+        request,
+        'onlinecourse/exam_result_bootstrap.html',
+        {"course":course, "sel_choices":choices,"correct_points":correct_points, 
+            "total_points": total_points, 
+            "submission": submission,
+            "grade": grade }
+    )
 
 
 

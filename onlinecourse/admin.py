@@ -38,6 +38,7 @@ class QuestionAdmin(admin.ModelAdmin):
 
 class ChoiceAdmin(admin.ModelAdmin):
     list_display = ['title']
+    #list_display = ('title', 'is_correct')
 # <HINT> Register Question and Choice models here
 
 admin.site.register(Course, CourseAdmin)
