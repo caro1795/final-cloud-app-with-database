@@ -104,7 +104,7 @@ class Enrollment(models.Model):
 class Question(models.Model):
     title = models.CharField(max_length=1000, default="title")
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    
+    order = models.IntegerField(default=0)
     grade_point = models.IntegerField(default=1)
 
     # <HINT> A sample model method to calculate if learner get the score of the question
@@ -125,7 +125,7 @@ class Question(models.Model):
     # Other fields and methods you would like to design
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=1000)
+    title = models.CharField(max_length=1000)
     is_correct = False
 
 # <HINT> The submission model
